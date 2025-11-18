@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .question-counter {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-container {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .option.selected {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: #ff9a9e;
+            box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #prev-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        #next-btn {
+            background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+            color: #333;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            animation: popIn 0.5s ease;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .result-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .result-score {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+
+        .result-message {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        #restart-btn {
+            background: white;
+            color: #6a11cb;
+            font-weight: bold;
+            padding: 15px 30px;
+        }
+
+        .good {
+            color: #4cd964;
+        }
+
+        .moderate {
+            color: #ffcc00;
+        }
+
+        .severe {
+            color: #ff3b30;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .question-text {
+                font-size: 1.2rem;
+            }
+
+            .option {
+                padding: 12px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <header>
+        <h1>Mental Health Test</h1>
+        <p class="description">Answer all 17 questions to discover your mental health status</p>
+    </header>
+
+    <div class="question-counter">Question <span id="current-question">1</span> of 17</div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div class="question-container">
+        <div class="question-text" id="question-text">Question will appear here</div>
+        <div class="options-container" id="options-container">
+            <!-- Options will be dynamically generated here -->
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button id="prev-btn" disabled>Previous</button>
+        <button id="next-btn">Next</button>
+    </div>
+</div>
+
+<div class="result-modal" id="result-modal">
+    <div class="modal-content">
+        <h2 class="result-title">Thank You For Answering!</h2>
+        <div class="result-score">Your Score: <span id="final-score">0</span></div>
+        <p class="result-message" id="result-message"></p>
+        <button id="restart-btn">Take Test Again</button>
+    </div>
+</div>
+
+<script>
+    // Quiz questions data
+    const questions = [
+        // 9 questions with 5 options
+        {
+            text: "বিষণ্ণ মেজাজ (দুঃখবোধ, আশাহীন, অসহায়, মূল্যহীন)",
+            options: [
+                "অনুপস্থিত",
+                "এই অনুভূতিগুলো শুধুমাত্র প্রশ্ন করার পরেই নির্দেশিত হয়",
+                "এই অনুভূতিগুলো স্বতঃস্ফূর্তভাবে মৌখিকভাবে জানানো হয়",
+                "অমৌখিকভাবে অনুভূতিগুলো যোগাযোগ করে, যেমন মুখের ভাব, অঙ্গভঙ্গি, কণ্ঠস্বর এবং কান্নার প্রবণতার মাধ্যমে",
+                "রোগী তার স্বতঃস্ফূর্ত মৌখিক এবং অমৌখিক যোগাযোগের মধ্যে কার্যত কেবল এই অনুভূতিগুলোই জানায়"],
+            type: 5
+        },
+        {
+            text: "অপরাধবোধের অনুভূতি (অপরাধ, অনুশোচনা, আত্ম-নিন্দা)",
+            options: [
+                "অনুপস্থিত",
+                "আত্ম-নিন্দা, মনে করে সে লোকেদের হতাশ করেছে",
+                "অপরাধবোধের ধারণা বা অতীতের ভুল বা পাপপূর্ণ কাজের উপর জাবর কাটা",
+                "বর্তমান অসুস্থতা একটি শাস্তি। অপরাধবোধের বিভ্রম",
+                "দোষারোপকারী বা নিন্দামূলক কণ্ঠস্বর শোনে এবং/অথবা ভীতিকর দৃষ্টি বিভ্রম অনুভব করে"],
+            type: 5
+        },
+        {
+            text: "আত্মহত্যা (অনুভূতি, ধারণা, অঙ্গভঙ্গি)",
+            options: [
+                "অনুপস্থিত",
+                "মনে হয় জীবন যাপনের যোগ্য নয়",
+                "ইচ্ছে করে যে সে মরে যাক বা নিজের সম্ভাব্য মৃত্যু সম্পর্কে কোনো চিন্তা",
+                "আত্মহত্যার ধারণা বা অঙ্গভঙ্গি",
+                "আত্মহত্যার প্রচেষ্টা"],
+            type: 5
+        },
+        {
+            text: "শারীরিক উদ্বেগ (উদ্বেগের শারীরিক অনুষঙ্গ যেমন: মুখ শুকিয়ে যাওয়া, পেটে গ্যাস, বদহজম, ডায়রিয়া, পেট কামড়ানো, ঢেকুর, হৃৎপিণ্ডের দ্রুত স্পন্দন, মাথাব্যথা, দীর্ঘশ্বাস, অতি-শ্বাসপ্রশ্বাস, ঘন ঘন প্রস্রাব, ঘামা ইত্যাদি)",
+            options: [
+                "অনুপস্থিত",
+                "সামান্য",
+                "মাঝারি",
+                "তীব্র",
+                "অক্ষমকারী"],
+            type: 5
+        },
+        {
+            text: "হাইপোকন্ড্রিয়াসিস",
+            options: [
+                "উপস্থিত নেই",
+                "আত্ম-মগ্নতা (শারীরিকভাবে)",
+                "স্বাস্থ্য নিয়ে পূর্বধারণা",
+                "ঘন ঘন অভিযোগ, সাহায্যের জন্য অনুরোধ ইত্যাদি",
+                "হাইপোকন্ড্রিয়াকাল বিভ্রান্তি"
+            ],
+            type: 5
+        },
+        {
+            text: "কাজ এবং কার্যকলাপ",
+            options: [
+                "কোনো অসুবিধা নেই",
+                "কার্যকলাপ, কাজ বা শখের সাথে সম্পর্কিত অক্ষমতা, ক্লান্তি বা দুর্বলতার চিন্তা ও অনুভূতি",
+                "কার্যকলাপ, শখ বা কাজে আগ্রহের হ্রাস - হয় রোগীর দ্বারা সরাসরি জানানো বা নিস্তেজতা, সিদ্ধান্তহীনতা এবং দ্বিধার মধ্যে পরোক্ষ (মনে হয় যেন তাকে কাজ বা কার্যকলাপের জন্য নিজেকে চাপ দিতে হচ্ছে)",
+                "কার্যকলাপে ব্যয় করা প্রকৃত সময়ের হ্রাস বা উৎপাদনশীলতার হ্রাস। যদি রোগী রুটিন কাজগুলি বাদে প্রতিদিন কমপক্ষে তিন ঘন্টা কার্যকলাপে (চাকরি বা শখ) না কাটান, তবে ৩ রেট করুন",
+                "বর্তমান অসুস্থতার কারণে কাজ করা বন্ধ। যদি রোগী রুটিন কাজগুলি ব্যতীত কোনো কার্যকলাপে নিযুক্ত না হন, অথবা যদি রোগী সাহায্য ছাড়া রুটিন কাজগুলি করতে ব্যর্থ হন, তবে ৪ রেট করুন"
+            ],
+            type: 5
+        },
+        {
+            text: "মন্থরতা (চিন্তা ও কথার ধীরগতি, মনোযোগের দুর্বলতা, হ্রাসপ্রাপ্ত মোটর কার্যকলাপ)",
+            options: [
+                "স্বাভাবিক কথা ও চিন্তা",
+                "সাক্ষাৎকারের সময় সামান্য মন্থরতা",
+                "সাক্ষাৎকারের সময় সুস্পষ্ট মন্থরতা",
+                "সাক্ষাৎকারে অসুবিধা",
+                "সম্পূর্ণ স্তব্ধতা"
+            ],
+            type: 5
+        },
+        {
+            text: "মানসিক উদ্বেগ (চিন্তা, দুর্ভাগ্যের পূর্বাভাস, উত্তেজনার অনুভূতি)",
+            options: [
+                "কোনো অসুবিধা নেই",
+                "বিষয়গত উত্তেজনা এবং খিটখিটে ভাব",
+                "ছোটখাটো বিষয় নিয়ে চিন্তা",
+                "চেহারা বা কথায় উদ্বেগমূলক মনোভাব স্পষ্ট",
+                "জিজ্ঞাসা না করেই ভয়ের প্রকাশ"
+            ],
+            type: 5
+        },
+        {
+            text: "আন্দোলন (অস্থিরতা, পায়চারী, হাত মোচড়ানো ইত্যাদি)",
+            options: [
+                "কিছুই না",
+                "অস্থিরতা",
+                "হাত, চুল ইত্যাদি নিয়ে খেলা",
+                "ঘোরাঘুরি, স্থিরভাবে [বসে থাকতে] পারে না",
+                "হাত মোচড়ানো, নখ কামড়ানো, চুল টানা, ঠোঁট কামড়ানো"
+            ],
+            type: 5
+        },
+        // 7 questions with 3 options
+        {
+            text: "অনিদ্রা: রাতের শুরুতে",
+            options: [
+                "ঘুমিয়ে পড়তে কোনো অসুবিধা নেই",
+                "মাঝে মাঝে ঘুমিয়ে পড়তে অসুবিধার অভিযোগ, যেমন $\frac{1}{2}$ ঘন্টার বেশি",
+                "রাতে ঘুমিয়ে পড়তে অসুবিধার অভিযোগ"
+            ],
+            type: 3
+        },
+        {
+            text: "অনিদ্রা: রাতের মাঝামাঝি",
+            options: [
+                "কোনো অসুবিধা নেই",
+                "রাতে অস্থির ও বিক্ষিপ্ত থাকার অভিযোগ রোগীর",
+                "রাতে জেগে ওঠা [কোনো] বিছানা থেকে ওঠার হার ২ রেট করা হয় (প্রস্রাব করার উদ্দেশ্য ছাড়া)"
+            ],
+            type: 3
+        },
+        {
+            text: "অনিদ্রা: ভোরের প্রথম দিকে",
+            options: [
+                "কোনো অসুবিধা নেই",
+                "ভোরের প্রথম দিকে জেগে ওঠা কিন্তু আবার ঘুমিয়ে পড়ে",
+                "বিছানা থেকে উঠলে পুনরায় ঘুমিয়ে পড়তে অক্ষম"
+            ],
+            type: 3
+        },
+        {
+            text: "কায়িক উপসর্গ গ্যাস্ট্রো-ইনটেস্টাইনাল",
+            options: [
+                "কিছুই না",
+                "ক্ষুধা হ্রাস কিন্তু কর্মীদের উৎসাহ ছাড়া খাওয়া। পেটে ভারী অনুভূতি",
+                "কর্মচারীর তাগিদ ছাড়া খেতে অসুবিধা। অন্ত্রের জন্য বা গ্যাস্ট্রো-ইনটেস্টাইনাল উপসর্গের জন্য ল্যাক্সেটিভ বা ওষুধের অনুরোধ করে বা প্রয়োজন হয়"
+            ],
+            type: 3
+        },
+        {
+            text: "সাধারণ কায়িক উপসর্গ (পেশীর ব্যথা এবং বেদনা, অসাড়তা, ঝিনঝিন করা ইত্যাদি)",
+            options: [
+                "কিছুই না",
+                "অঙ্গে, পিঠে বা মাথায় ভারী ভাব। পিঠে ব্যথা, মাথা ব্যথা, পেশীর ব্যথা। শক্তি এবং ক্লান্তির হ্রাস",
+                "যেকোনও স্পষ্ট লক্ষণ ২ রেট করা হয়"
+            ],
+            type: 3
+        },
+        {
+            text: "জননাঙ্গীয় উপসর্গ (যেমন যৌন আকাঙ্ক্ষার হ্রাস, মাসিকের ব্যাঘাত)",
+            options: [
+                "অনুপস্থিত",
+                "সামান্য",
+                "তীব্র"
+            ],
+            type: 3
+        },
+        {
+            text: "অন্তর্দৃষ্টি",
+            options: [
+                "বিষণ্ণ ও অসুস্থ বলে স্বীকার করে",
+                "অসুস্থতা স্বীকার করে কিন্তু কারণ হিসেবে খারাপ খাদ্য, জলবায়ু, অতিরিক্ত কাজ, ভাইরাস, বিশ্রামের প্রয়োজন ইত্যাদি চিহ্নিত করে",
+                "মোটেই অসুস্থতা অস্বীকার করে"
+            ],
+            type: 3
+        },
+        // 1 question with 4 options (special case)
+        {
+            text: "ওজনের হ্রাস",
+            options: [
+                "ওজনের হ্রাস নেই",
+                "বর্তমান অসুস্থতার সাথে সম্পর্কিত সম্ভাব্য ওজন হ্রাস",
+                "নির্দিষ্ট (রোগীর মতে) ওজন হ্রাস",
+                "মূল্যায়ন করা হয়নি"
+            ],
+            type: 4
+        }
+    ];
+
+    // DOM elements
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const currentQuestionElement = document.getElementById('current-question');
+    const progressBar = document.getElementById('progress-bar');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const resultModal = document.getElementById('result-modal');
+    const finalScoreElement = document.getElementById('final-score');
+    const resultMessage = document.getElementById('result-message');
+    const restartBtn = document.getElementById('restart-btn');
+
+    // Quiz state
+    let currentQuestion = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+    let score = 0;
+
+    // Initialize quiz
+    function initQuiz() {
+        showQuestion();
+        updateProgressBar();
+        updateButtons();
+    }
+
+    // Display current question and options
+    function showQuestion() {
+        const question = questions[currentQuestion];
+        questionText.textContent = question.text;
+        currentQuestionElement.textContent = currentQuestion + 1;
+
+        // Clear previous options
+        optionsContainer.innerHTML = '';
+
+        // Create new options
+        question.options.forEach((option, index) => {
+            const optionElement = document.createElement('div');
+            optionElement.classList.add('option');
+            optionElement.textContent = option;
+
+            // Check if this option was previously selected
+            if (userAnswers[currentQuestion] === index) {
+                optionElement.classList.add('selected');
+            }
+
+            optionElement.addEventListener('click', () => selectOption(index));
+            optionsContainer.appendChild(optionElement);
+        });
+    }
+
+    // Handle option selection
+    function selectOption(optionIndex) {
+        // Remove selected class from all options
+        const options = document.querySelectorAll('.option');
+        options.forEach(option => option.classList.remove('selected'));
+
+        // Add selected class to clicked option
+        options[optionIndex].classList.add('selected');
+
+        // Store the answer
+        userAnswers[currentQuestion] = optionIndex;
+
+        // Enable next button if it's disabled
+        if (currentQuestion === questions.length - 1) {
+            nextBtn.textContent = 'Submit';
+        }
+
+        updateButtons();
+    }
+
+    // Update navigation buttons state
+    function updateButtons() {
+        prevBtn.disabled = currentQuestion === 0;
+
+        // Enable next button only if current question is answered
+        const isAnswered = userAnswers[currentQuestion] !== null;
+        nextBtn.disabled = !isAnswered;
+
+        if (currentQuestion === questions.length - 1 && isAnswered) {
+            nextBtn.textContent = 'Submit';
+        } else {
+            nextBtn.textContent = 'Next';
+        }
+    }
+
+    // Update progress bar
+    function updateProgressBar() {
+        const progress = ((currentQuestion + 1) / questions.length) * 100;
+        progressBar.style.width = `${progress}%`;
+    }
+
+    // Calculate final score
+    function calculateScore() {
+        let total = 0;
+
+        userAnswers.forEach((answer, index) => {
+            if (answer !== null) {
+                total += answer;
+            }
+        });
+
+        return total;
+    }
+
+    // Show result based on score
+    function showResult() {
+        score = calculateScore();
+        finalScoreElement.textContent = score;
+
+        let message = '';
+        let messageClass = '';
+
+        if (score >= 0 && score <= 7) {
+            message = "Good! Quality of your mental health is great right now. Keep up the positive habits and continue to take care of yourself.";
+            messageClass = "good";
+        } else if (score >= 8 && score <= 19) {
+            message = "Moderate. Quality of your mental health is average. Consider making some lifestyle changes or seeking support to improve your well-being.";
+            messageClass = "moderate";
+        } else if (score > 20) {
+            message = "Severe. Quality of your mental health is poor. It is strongly recommended to seek professional help or counseling to address your mental health concerns.";
+            messageClass = "severe";
+        } else {
+            message = "Error in calculating results. Please try again.";
+        }
+
+        resultMessage.textContent = message;
+        resultMessage.className = `result-message ${messageClass}`;
+        resultModal.style.display = 'flex';
+    }
+
+    // Event listeners
+    prevBtn.addEventListener('click', () => {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            showQuestion();
+            updateProgressBar();
+            updateButtons();
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            showQuestion();
+            updateProgressBar();
+            updateButtons();
+        } else {
+            // Last question - submit quiz
+            showResult();
+        }
+    });
+
+    restartBtn.addEventListener('click', () => {
+        // Reset quiz state
+        currentQuestion = 0;
+        userAnswers = new Array(questions.length).fill(null);
+        score = 0;
+
+        // Hide result modal
+        resultModal.style.display = 'none';
+
+        // Restart quiz
+        initQuiz();
+    });
+
+    // Initialize the quiz
+    initQuiz();
+</script>
+</body>
+
+</html>

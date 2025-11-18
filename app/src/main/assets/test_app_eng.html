@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .question-counter {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-container {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .option.selected {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: #ff9a9e;
+            box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #prev-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        #next-btn {
+            background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+            color: #333;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            animation: popIn 0.5s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .result-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .result-score {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+
+        .result-message {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        #restart-btn {
+            background: white;
+            color: #6a11cb;
+            font-weight: bold;
+            padding: 15px 30px;
+        }
+
+        .good {
+            color: #4cd964;
+        }
+
+        .moderate {
+            color: #ffcc00;
+        }
+
+        .severe {
+            color: #ff3b30;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .question-text {
+                font-size: 1.2rem;
+            }
+
+            .option {
+                padding: 12px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Mental Health Test</h1>
+        <p class="description">Answer all 17 questions to discover your mental health status</p>
+    </header>
+
+    <div class="question-counter">Question <span id="current-question">1</span> of 17</div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div class="question-container">
+        <div class="question-text" id="question-text">Question will appear here</div>
+        <div class="options-container" id="options-container">
+            <!-- Options will be dynamically generated here -->
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button id="prev-btn" disabled>Previous</button>
+        <button id="next-btn">Next</button>
+    </div>
+</div>
+
+<div class="result-modal" id="result-modal">
+    <div class="modal-content">
+        <h2 class="result-title">Thank You For Answering!</h2>
+        <div class="result-score">Your Score: <span id="final-score">0</span></div>
+        <p class="result-message" id="result-message"></p>
+        <button id="restart-btn">Take Test Again</button>
+    </div>
+</div>
+
+<script>
+    // Quiz questions data
+    const questions = [
+        // 9 questions with 5 options
+        {
+            text: "DEPRESSED MOOD (sadness, hopeless, helpless, worthless)",
+            options: ["Absent", "These feeling states indicated only on questioning", "These feeling states spontaneously reported verbally", "Communicates feeling states non-verbally, i.e through facial expression, posture, voice and tendency to weep", "Patient reports virtually only these feeling states in his/her sponteneous verbals and non-verbal communication"],
+            type: 5
+        },
+        {
+            text: "FEELINGS OF GUILT (guilt, regret, self-reproach)",
+            options: ["Absent", "Self reproach, feels he/she has let people down", "Ideas of guilt or rumination over past errors or sinful deeds", "Present illness is a punishment. Delusions of guilt", "Hears accusatory or denuniciatory voices and/or experinces threatening visual hallucinations"],
+            type: 5
+        },
+        {
+            text: "SUICIDE (feelings, ideation, gestures)",
+            options: ["Absent", "Feels life is not worth living", "Wishes he/she were dead or any thoughts of possible death to self", "Ideas or gestures of suicide", "Attempts at suicide"],
+            type: 5
+        },
+        {
+            text: "ANXIETY SOMATIC (physiological concomitants of anxiety such as : dry mouth, wind, indigestion, diarrhea, cramps, belching, cardiac palpitations, headaches, sighing, hyperventilation, urinary frequency, sweating etc.)",
+            options: ["Absent", "Mild", "Moderate", "Severe", "Incapacitating"],
+            type: 5
+        },
+        {
+            text: "HYPOCHONDRIASIS",
+            options: ["Not present", "Self-absorption (bodily)", "Preoccupation with health", "Frequent complaints, requests for help etc.", "Hypocondriacal delusions"],
+            type: 5
+        },
+        {
+            text: "WORK AND ACTIVITIES",
+            options: ["No difficulty", "Thoughts and feelings of incapacity, fatigue or weakness related to activities, work or hobbies", "Loss of interest in activity, hobbies,or work - either directly reported by the patient or indirect in listlessness, indecision and vacillation (feels he/she has to push self to work or activities)", "Decrease in actual time spent in activities or decrease in productivity. Rate 3 if the patient does not spend at least three hours a day in activities (job or hobbies) excluding routine chores", "Stopped working because of present illness. Rate 4 if patient engages in no activities except routine chores, or if patient fails to perform routine chores unassisted"],
+            type: 5
+        },
+        {
+            text: "RETARDATION (slowness of thought and speech, impaired ability to concentrate, decreased motor activity)",
+            options: ["Normal speech and thought", "Slight retardation during the interview", "Obvious retardation during the interview", "Interview difficult", "Complete stupor"],
+            type: 5
+        },
+        {
+            text: "ANXIETY PSYCHIC (worrying, anticipation of misfortune, feelings of tension)",
+            options: ["No difficulty", "Subjective tension and irritability", "Worrying about minor matters", "Apprehensive attitude apparent in face or speech", "Fears expressed without questioning"],
+            type: 5
+        },
+        {
+            text: "AGITATION (fidgetiness, pacing, hand-wringing etc.)",
+            options: ["None", "Fidgetiness", "Playing with hands, hair, etc", "Moving about, can’t sit stil", "Hand wringing, nail biting, hair-pulling, biting of lips"],
+            type: 5
+        },
+        // 7 questions with 3 options
+        {
+            text: "INSOMNIA: EARLY IN THE NIGHT",
+            options: ["No difficulty falling asleep", "Complains of occasional difficulty falling asleep, i.e. more than 1⁄2 hour", "Complains of nightly difficulty falling asleep"],
+            type: 3
+        },
+        {
+            text: "INSOMNIA: MIDDLE OF THE NIGHT",
+            options: ["No difficulty", "Patient complains of being restless and disturbed during the night", "Waking during the night – any getting out of bed rates 2 (except for purposes of voiding)"],
+            type: 3
+        },
+        {
+            text: "INSOMNIA: EARLY HOURS OF THE MORNING",
+            options: ["No difficulty", "Waking in early hours of the morning but goes back to sleep", "Unable to fall asleep again if he/she gets out of bed"],
+            type: 3
+        },
+        {
+            text: "SOMATIC SYMPTOMS GASTRO-INTESTINAL",
+            options: ["None", "Loss of appetite but eating without staff encouragement. Heavy feelings in abdomen", "Difficulty eating without staff urging. Requests or requires laxatives or medication for bowels or medication for gastro-intestinal symptoms"],
+            type: 3
+        },
+        {
+            text: "GENERAL SOMATIC SYMPTOMS (muscular aches and pains, numbness, tingling, etc.)",
+            options: ["None", "Heaviness in limbs, back or head. Backaches, headaches, muscle aches. Loss of energy and fatigability", "Any clear-cut symptom rates 2"],
+            type: 3
+        },
+        {
+            text: "GENITAL SYMPTOMS (symptoms such as loss of libido, menstrual disturbances)",
+            options: ["Absent", "Mild", "Severe"],
+            type: 3
+        },
+        {
+            text: "INSIGHT",
+            options: ["Acknowledges being depressed and ill", "Acknowledges illness but attributes cause to bad food, climate, overwork, virus, need for rest, etc", "Denies being ill at all"],
+            type: 3
+        },
+        // 1 question with 4 options (special case)
+        {
+            text: "LOSS OF WEIGHT",
+            options: ["No weight loss", "Probable weight loss associated with present illness", "Definite (according to patient) weight loss ", "Not assessed"],
+            type: 4
+        }
+    ];
+
+    // DOM elements
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const currentQuestionElement = document.getElementById('current-question');
+    const progressBar = document.getElementById('progress-bar');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const resultModal = document.getElementById('result-modal');
+    const finalScoreElement = document.getElementById('final-score');
+    const resultMessage = document.getElementById('result-message');
+    const restartBtn = document.getElementById('restart-btn');
+
+    // Quiz state
+    let currentQuestion = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+    let score = 0;
+
+    // Initialize quiz
+    function initQuiz() {
+        showQuestion();
+        updateProgressBar();
+        updateButtons();
+    }
+
+    // Display current question and options
+    function showQuestion() {
+        const question = questions[currentQuestion];
+        questionText.textContent = question.text;
+        currentQuestionElement.textContent = currentQuestion + 1;
+
+        // Clear previous options
+        optionsContainer.innerHTML = '';
+
+        // Create new options
+        question.options.forEach((option, index) => {
+            const optionElement = document.createElement('div');
+            optionElement.classList.add('option');
+            optionElement.textContent = option;
+
+            // Check if this option was previously selected
+            if (userAnswers[currentQuestion] === index) {
+                optionElement.classList.add('selected');
+            }
+
+            optionElement.addEventListener('click', () => selectOption(index));
+            optionsContainer.appendChild(optionElement);
+        });
+    }
+
+    // Handle option selection
+    function selectOption(optionIndex) {
+        // Remove selected class from all options
+        const options = document.querySelectorAll('.option');
+        options.forEach(option => option.classList.remove('selected'));
+
+        // Add selected class to clicked option
+        options[optionIndex].classList.add('selected');
+
+        // Store the answer
+        userAnswers[currentQuestion] = optionIndex;
+
+        // Enable next button if it's disabled
+        if (currentQuestion === questions.length - 1) {
+            nextBtn.textContent = 'Submit';
+        }
+
+        updateButtons();
+    }
+
+    // Update navigation buttons state
+    function updateButtons() {
+        prevBtn.disabled = currentQuestion === 0;
+
+        // Enable next button only if current question is answered
+        const isAnswered = userAnswers[currentQuestion] !== null;
+        nextBtn.disabled = !isAnswered;
+
+        if (currentQuestion === questions.length - 1 && isAnswered) {
+            nextBtn.textContent = 'Submit';
+        } else {
+            nextBtn.textContent = 'Next';
+        }
+    }
+
+    // Update progress bar
+    function updateProgressBar() {
+        const progress = ((currentQuestion + 1) / questions.length) * 100;
+        progressBar.style.width = `${progress}%`;
+    }
+
+    // Calculate final score
+    function calculateScore() {
+        let total = 0;
+
+        userAnswers.forEach((answer, index) => {
+            if (answer !== null) {
+                total += answer;
+            }
+        });
+
+        return total;
+    }
+
+    // Show result based on score
+    function showResult() {
+        score = calculateScore();
+        finalScoreElement.textContent = score;
+
+        let message = '';
+        let messageClass = '';
+
+        if (score >= 0 && score <= 7) {
+            message = "Good! Quality of your mental health is great right now. Keep up the positive habits and continue to take care of yourself.";
+            messageClass = "good";
+        } else if (score >= 8 && score <= 19) {
+            message = "Moderate. Quality of your mental health is average. Consider making some lifestyle changes or seeking support to improve your well-being.";
+            messageClass = "moderate";
+        } else if (score > 20) {
+            message = "Severe. Quality of your mental health is poor. It is strongly recommended to seek professional help or counseling to address your mental health concerns.";
+            messageClass = "severe";
+        } else {
+            message = "Error in calculating results. Please try again.";
+        }
+
+        resultMessage.textContent = message;
+        resultMessage.className = `result-message ${messageClass}`;
+        resultModal.style.display = 'flex';
+    }
+
+    // Event listeners
+    prevBtn.addEventListener('click', () => {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            showQuestion();
+            updateProgressBar();
+            updateButtons();
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            showQuestion();
+            updateProgressBar();
+            updateButtons();
+        } else {
+            // Last question - submit quiz
+            showResult();
+        }
+    });
+
+    restartBtn.addEventListener('click', () => {
+        // Reset quiz state
+        currentQuestion = 0;
+        userAnswers = new Array(questions.length).fill(null);
+        score = 0;
+
+        // Hide result modal
+        resultModal.style.display = 'none';
+
+        // Restart quiz
+        initQuiz();
+    });
+
+    // Initialize the quiz
+    initQuiz();
+</script>
+</body>
+</html>
